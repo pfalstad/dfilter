@@ -1,7 +1,7 @@
-# ripplegl
-Ripple Tank, webgl version
+# dfilter
+DFilter, javascript version
 
-Source for http://www.falstad.com/ripple/
+Source for http://www.falstad.com/dfilter/
 
 ## License
 
