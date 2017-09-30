@@ -139,6 +139,7 @@ public class DFilterSim implements MouseDownHandler, MouseMoveHandler,
     Scrollbar shiftFreqBar;
     Label kaiserLabel;
     Scrollbar kaiserBar;
+    Scrollbar scaleBar;
     boolean editingFunc;
     boolean dragStop;
     double inputW;
@@ -200,7 +201,7 @@ public class DFilterSim implements MouseDownHandler, MouseMoveHandler,
 	DialogBox dialogBox;
 	int verticalPanelWidth;
 	String startLayoutText = null;
-	String versionString = "1.0";
+	String versionString = "1.0a";
 	static DFilterSim theSim;
     NumberFormat showFormat;
     int customMp3Index;
@@ -238,6 +239,7 @@ public class DFilterSim implements MouseDownHandler, MouseMoveHandler,
 			inputBar.setWidth(verticalPanelWidth);
 			shiftFreqBar.setWidth(verticalPanelWidth);
 			kaiserBar.setWidth(verticalPanelWidth);
+			scaleBar.setWidth(verticalPanelWidth);
 		}
 		if (cv != null) {
 			cv.setWidth(width + "PX");
@@ -512,6 +514,11 @@ public class DFilterSim implements MouseDownHandler, MouseMoveHandler,
     			new Command() {
     		public void execute() { scrollbarMoved(); } }));
 
+        verticalPanel.add(new Label("Response dB Scale"));
+        verticalPanel.add(scaleBar = new Scrollbar(Scrollbar.HORIZONTAL, 500, 1, 1, 999,
+    			new Command() {
+    		public void execute() { scrollbarMoved(); } }));
+
     	verticalPanel.add(iFrame = new Frame("iframe.html"));
     	iFrame.setWidth(verticalPanelWidth+"px");
     	iFrame.setHeight("100 px");
@@ -758,7 +765,7 @@ public class DFilterSim implements MouseDownHandler, MouseMoveHandler,
             g.setColor(Color.black);
             /*i = respView.x + respView.width/2;
               g.drawLine(i, respView.y, i, respView.y+respView.height);*/
-            double ym = .069;
+            double ym = getDbScale();
             for (i = 0; ; i += 2) {
                 double q = ym*i;
                 if (q > 1)
@@ -1135,7 +1142,7 @@ public class DFilterSim implements MouseDownHandler, MouseMoveHandler,
             g.fillRect(spectrumView.x, spectrumView.y,
                        spectrumView.width, spectrumView.height);
             g.setColor(Color.black);
-            double ym = .138;
+            double ym = getDbScale()*2;
             for (i = 0; ; i++) {
                 double q = ym*i;
                 if (q > 1)
@@ -1238,6 +1245,12 @@ public class DFilterSim implements MouseDownHandler, MouseMoveHandler,
 		cvcontext.drawImage(backcontext.getCanvas(), 0.0, 0.0);
     }
 
+    double getDbScale() {
+        double ym = .069;
+        ym *= 500./scaleBar.getValue();
+        return ym;
+    }
+    
     void setCutoff(double f) { }
 
     void setCustomPolesZeros() {
@@ -1520,7 +1533,7 @@ public class DFilterSim implements MouseDownHandler, MouseMoveHandler,
         double xx1 = getFreqFromX(x  , respView)*2;
         double xx2 = getFreqFromX(x+1, respView)*2;
         y -= respView.y;
-        double ym = .069;
+        double ym = getDbScale();
         double yy = Math.exp(-y*Math.log(10)/(ym*4*respView.height));
         if (yy >= 1)
             yy = 1;
